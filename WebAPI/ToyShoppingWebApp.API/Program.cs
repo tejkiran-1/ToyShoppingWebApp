@@ -7,6 +7,12 @@ using ToyShoppingWebApp.Application.Repositories.Implementations;
 using ToyShoppingWebApp.Application.Repositories.Interfaces;
 using ToyShoppingWebApp.Application.Services.Implementations;
 using ToyShoppingWebApp.Application.Services.Interfaces;
+using ToyShoppingWebApp.API.Middleware;
+using Serilog;
+using AspNetCoreRateLimit;
+using ToyShoppingWebApp.API.Middleware;
+using Serilog;
+using AspNetCoreRateLimit;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -102,6 +108,35 @@ builder.Services.AddCors(options =>
 // Add HttpContextAccessor (for accessing user context in services)
 builder.Services.AddHttpContextAccessor();
 
+// Add Serilog for structured logging
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Information()
+    .Enrich.FromLogContext()
+    .Enrich.WithProperty("Application", "ToyShoppingWebApp")
+    .WriteTo.Console(outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz}] [{Level:u3}] {Message:lj}{NewLine}{Exception}")
+    .CreateLogger();
+
+builder.Host.UseSerilog();
+
+// Add Rate Limiting (DDoS protection)
+builder.Services.AddMemoryCache();
+builder.Services.AddInMemoryRateLimiting(); builder.Services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
+builder.Services.Configure<IpRateLimitOptions>(options =>
+{
+    options.EnableEndpointRateLimiting = true;
+    options.StackBlockedRequests = false;
+    options.HttpStatusCode = 429;
+    options.GeneralRules = new List<RateLimitRule>
+    {
+        new RateLimitRule
+        {
+            Endpoint = "*",
+            Limit = 100,
+            Period = "1m"
+        }
+    };
+});
+
 // ==========================================
 // 2. BUILD THE APPLICATION
 // ==========================================
@@ -112,8 +147,14 @@ var app = builder.Build();
 // 3. CONFIGURE MIDDLEWARE PIPELINE (ORDER MATTERS!)
 // ==========================================
 
-// Global exception handling should be first
-// (we'll add custom middleware later)
+// Global exception middleware (MUST BE FIRST)
+app.UseMiddleware<GlobalExceptionMiddleware>();
+
+// Security headers middleware
+app.UseMiddleware<SecurityHeadersMiddleware>();
+
+// Rate limiting middleware
+app.UseIpRateLimiting();
 
 // HTTPS redirection
 if (!app.Environment.IsDevelopment())
@@ -140,4 +181,17 @@ app.MapControllers();
 // 4. RUN THE APPLICATION
 // ==========================================
 
-app.Run();
+try
+{
+    Log.Information("🚀 Starting ToyShoppingWebApp API...");
+    app.Run();
+}
+catch (Exception ex)
+{
+    Log.Fatal(ex, "❌ Application terminated unexpectedly");
+}
+finally
+{
+    Log.Information("🛑 Shutting down ToyShoppingWebApp API");
+    Log.CloseAndFlush();
+}
