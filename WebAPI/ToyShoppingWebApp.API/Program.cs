@@ -10,9 +10,6 @@ using ToyShoppingWebApp.Application.Services.Interfaces;
 using ToyShoppingWebApp.API.Middleware;
 using Serilog;
 using AspNetCoreRateLimit;
-using ToyShoppingWebApp.API.Middleware;
-using Serilog;
-using AspNetCoreRateLimit;
 
 var builder = WebApplication.CreateBuilder(args);
 
