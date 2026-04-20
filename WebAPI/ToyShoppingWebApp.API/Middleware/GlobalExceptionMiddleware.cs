@@ -37,18 +37,12 @@ namespace ToyShoppingWebApp.API.Middleware
                 context.Response.ContentType = "application/json";
                 context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
 
-                // Create consistent error response
-                var errorResponse = new
-                {
-                    message = "An error occurred while processing your request.",
-                    correlationId = correlationId,
-                    timestamp = DateTime.UtcNow,
-                    statusCode = context.Response.StatusCode
-                };
-
-                // Add detailed error info in Development only
+                // Create consistent error response (use object to allow different types)
+                object errorResponse;
+                
                 if (context.RequestServices.GetRequiredService<IWebHostEnvironment>().IsDevelopment())
                 {
+                    // Development: include detailed error info
                     errorResponse = new
                     {
                         message = ex.Message,
@@ -58,6 +52,17 @@ namespace ToyShoppingWebApp.API.Middleware
                         exception = ex.GetType().Name,
                         stackTrace = ex.StackTrace,
                         innerException = ex.InnerException?.Message
+                    };
+                }
+                else
+                {
+                    // Production: generic message only
+                    errorResponse = new
+                    {
+                        message = "An error occurred while processing your request.",
+                        correlationId = correlationId,
+                        timestamp = DateTime.UtcNow,
+                        statusCode = context.Response.StatusCode
                     };
                 }
 

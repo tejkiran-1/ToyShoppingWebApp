@@ -11,51 +11,38 @@ using ToyShoppingWebApp.Application.Services.Interfaces;
 var builder = WebApplication.CreateBuilder(args);
 
 // ==========================================
+// 0. LOAD SECRETS FROM ENVIRONMENT VARIABLES
+// ==========================================
+
+// Read from environment variables (for local dev and production)
+string? connectionString = Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection") 
+    ?? builder.Configuration.GetConnectionString("DefaultConnection");
+string? jwtSecret = Environment.GetEnvironmentVariable("JwtSettings__Secret") 
+    ?? builder.Configuration["JwtSettings:Secret"];
+
+// Validate secrets are provided
+if (string.IsNullOrEmpty(connectionString) || string.IsNullOrEmpty(jwtSecret))
+{
+    Console.WriteLine("⚠️  SECRETS NOT FOUND!");
+    Console.WriteLine("Set environment variables:");
+    Console.WriteLine("  export ConnectionStrings__DefaultConnection=\"your-connection-string\"");
+    Console.WriteLine("  export JwtSettings__Secret=\"your-jwt-secret\"");
+    throw new InvalidOperationException("Required configuration values are missing. See output above.");
+}
+
+Console.WriteLine("✅ Secrets loaded from environment variables");
+
+// ==========================================
 // 1. ADD SERVICES TO DEPENDENCY INJECTION CONTAINER
 // ==========================================
 
 // Add controllers
 builder.Services.AddControllers();
 
-// // Add Swagger/OpenAPI
-// builder.Services.AddSwaggerGen(c =>
-// {
-//     c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
-//     {
-//         Title = "Toy Shopping Web App API",
-//         Version = "v1",
-//         Description = "REST API for toy shopping application"
-//     });
-
-//     // Add JWT authentication to Swagger UI
-//     c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
-//     {
-//         Type = Microsoft.OpenApi.Models.SecuritySchemeType.Http,
-//         Scheme = "bearer",
-//         BearerFormat = "JWT",
-//         Description = "Enter JWT token"
-//     });
-
-//     c.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
-//     {
-//         {
-//             new Microsoft.OpenApi.Models.OpenApiSecurityScheme
-//             {
-//                 Reference = new Microsoft.OpenApi.Models.OpenApiReference
-//                 {
-//                     Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
-//                     Id = "Bearer"
-//                 }
-//             },
-//             new string[] { }
-//         }
-//     });
-// });
-
 // Add DbContext (Scoped = new instance per HTTP request)
 builder.Services.AddDbContext<ToyShoppingDbContext>(options =>
     options.UseSqlServer(
-        builder.Configuration.GetConnectionString("DefaultConnection"),
+        connectionString,
         sqlOptions => sqlOptions.MigrationsAssembly("ToyShoppingWebApp.API"))
 );
 // How DbContext is Scoped? Does it not required any keyword like AddScoped?
@@ -76,7 +63,6 @@ builder.Services.AddScoped<ICategoryService, CategoryService>();
 
 // Configure JWT Authentication
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
-var jwtSecret = jwtSettings["Secret"];
 
 builder.Services.AddAuthentication(options =>
 {
