@@ -1,0 +1,11 @@
+/Users/kushwte/Documents/Learning/ToyShoppingWebApp/WebAPI/ToyShoppingWebApp.Domain/bin/Debug/net9.0/ToyShoppingWebApp.Domain.deps.json
+/Users/kushwte/Documents/Learning/ToyShoppingWebApp/WebAPI/ToyShoppingWebApp.Domain/bin/Debug/net9.0/ToyShoppingWebApp.Domain.dll
+/Users/kushwte/Documents/Learning/ToyShoppingWebApp/WebAPI/ToyShoppingWebApp.Domain/bin/Debug/net9.0/ToyShoppingWebApp.Domain.pdb
+/Users/kushwte/Documents/Learning/ToyShoppingWebApp/WebAPI/ToyShoppingWebApp.Domain/obj/Debug/net9.0/ToyShoppingWebApp.Domain.GeneratedMSBuildEditorConfig.editorconfig
+/Users/kushwte/Documents/Learning/ToyShoppingWebApp/WebAPI/ToyShoppingWebApp.Domain/obj/Debug/net9.0/ToyShoppingWebApp.Domain.AssemblyInfoInputs.cache
+/Users/kushwte/Documents/Learning/ToyShoppingWebApp/WebAPI/ToyShoppingWebApp.Domain/obj/Debug/net9.0/ToyShoppingWebApp.Domain.AssemblyInfo.cs
+/Users/kushwte/Documents/Learning/ToyShoppingWebApp/WebAPI/ToyShoppingWebApp.Domain/obj/Debug/net9.0/ToyShoppingWebApp.Domain.csproj.CoreCompileInputs.cache
+/Users/kushwte/Documents/Learning/ToyShoppingWebApp/WebAPI/ToyShoppingWebApp.Domain/obj/Debug/net9.0/ToyShoppingWebApp.Domain.dll
+/Users/kushwte/Documents/Learning/ToyShoppingWebApp/WebAPI/ToyShoppingWebApp.Domain/obj/Debug/net9.0/refint/ToyShoppingWebApp.Domain.dll
+/Users/kushwte/Documents/Learning/ToyShoppingWebApp/WebAPI/ToyShoppingWebApp.Domain/obj/Debug/net9.0/ToyShoppingWebApp.Domain.pdb
+/Users/kushwte/Documents/Learning/ToyShoppingWebApp/WebAPI/ToyShoppingWebApp.Domain/obj/Debug/net9.0/ref/ToyShoppingWebApp.Domain.dll
