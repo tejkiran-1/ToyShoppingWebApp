@@ -10,30 +10,55 @@ using ToyShoppingWebApp.Application.Services.Interfaces;
 using ToyShoppingWebApp.API.Middleware;
 using Serilog;
 using AspNetCoreRateLimit;
+using Azure.Identity;
+using Azure.Security.KeyVault.Secrets;
+using Azure.Extensions.AspNetCore.Configuration.Secrets;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // ==========================================
-// 0. LOAD SECRETS FROM ENVIRONMENT VARIABLES
+// LOAD SECRETS FROM AZURE KEY VAULT
 // ==========================================
 
-// Read from environment variables (for local dev and production)
-string? connectionString = Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection") 
-    ?? builder.Configuration.GetConnectionString("DefaultConnection");
-string? jwtSecret = Environment.GetEnvironmentVariable("JwtSettings__Secret") 
-    ?? builder.Configuration["JwtSettings:Secret"];
+// Use Key Vault if available (production), otherwise fall back to environment variables
+var keyVaultUrl = "https://tej-keyvault.vault.azure.net/";
+try
+{
+    var secretClient = new SecretClient(new Uri(keyVaultUrl), new DefaultAzureCredential());
+    builder.Configuration.AddAzureKeyVault(secretClient, new AzureKeyVaultConfigurationOptions());
+    Console.WriteLine("✅ Azure Key Vault configuration added successfully");
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"⚠️  Azure Key Vault not available: {ex.Message}");
+    Console.WriteLine("Falling back to environment variables or config files");
+}
+
+// ==========================================
+// 0. LOAD SECRETS (FROM KEY VAULT → ENV VARS → CONFIG FILES)
+// ==========================================
+
+// Priority: Key Vault > Environment Variables > appsettings.json
+// Key Vault secret names: ConnectionStrings--DefaultConnection, Jwt--Secret
+string? connectionString = builder.Configuration["ConnectionStrings--DefaultConnection"]  // Key Vault uses -- instead of :
+    ?? builder.Configuration["ConnectionStrings:DefaultConnection"]
+    ?? Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection");
+string? jwtSecret = builder.Configuration["Jwt--Secret"]  // Key Vault: Jwt--Secret
+    ?? builder.Configuration["JwtSettings:Secret"]
+    ?? Environment.GetEnvironmentVariable("JwtSettings__Secret");
 
 // Validate secrets are provided
 if (string.IsNullOrEmpty(connectionString) || string.IsNullOrEmpty(jwtSecret))
 {
-    Console.WriteLine("⚠️  SECRETS NOT FOUND!");
-    Console.WriteLine("Set environment variables:");
-    Console.WriteLine("  export ConnectionStrings__DefaultConnection=\"your-connection-string\"");
-    Console.WriteLine("  export JwtSettings__Secret=\"your-jwt-secret\"");
-    throw new InvalidOperationException("Required configuration values are missing. See output above.");
+    Console.WriteLine("❌ SECRETS NOT FOUND!");
+    Console.WriteLine("Checked in order:");
+    Console.WriteLine("  1. Key Vault: ConnectionStrings--DefaultConnection, Jwt--Secret");
+    Console.WriteLine("  2. Environment: ConnectionStrings__DefaultConnection, JwtSettings__Secret");
+    Console.WriteLine("  3. Config: ConnectionStrings:DefaultConnection, JwtSettings:Secret");
+    throw new InvalidOperationException("Required configuration values are missing.");
 }
 
-Console.WriteLine("✅ Secrets loaded from environment variables");
+Console.WriteLine("✅ Secrets loaded successfully from Key Vault, environment, or config");
 
 // ==========================================
 // 1. ADD SERVICES TO DEPENDENCY INJECTION CONTAINER
