@@ -1,0 +1,20 @@
+<div class="dashboard">
+    <nav class="navbar">
+        <h1>🛍️ Customer Dashboard</h1>
+        <button (click)="logout()">Logout</button>
+    </nav>
+
+    <div class="content">
+        <h2>Welcome, {{ userRole }}! 👋</h2>
+        <p>Choose an option below:</p>
+        
+        <div class="menu">
+            <button (click)="navigate('/customer/toys')" class="menu-btn">
+            🧸 Browse Toys
+            </button>
+            <button (click)="navigate('/customer/orders')" class="menu-btn">
+            📦 My Orders
+            </button>
+        </div>
+    </div>
+</div>

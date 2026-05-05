@@ -1,0 +1,20 @@
+<div class="dashboard">
+    <nav class="navbar">
+    <h1>⚙️ Admin Dashboard</h1>
+    <button (click)="logout()">Logout</button>
+    </nav>
+
+    <div class="content">
+    <h2>Welcome, Admin! 👋</h2>
+    <p>Admin Controls:</p>
+    
+    <div class="menu">
+        <button (click)="navigate('/admin/toys')" class="menu-btn">
+        🧸 Manage Toys
+        </button>
+        <button (click)="navigate('/admin/orders')" class="menu-btn">
+        📦 View All Orders
+        </button>
+    </div>
+    </div>
+</div>

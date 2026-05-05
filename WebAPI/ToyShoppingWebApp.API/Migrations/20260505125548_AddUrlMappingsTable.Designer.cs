@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ToyShoppingWebApp.Application.Data;
 
@@ -11,9 +12,11 @@ using ToyShoppingWebApp.Application.Data;
 namespace ToyShoppingWebApp.API.Migrations
 {
     [DbContext(typeof(ToyShoppingDbContext))]
-    partial class ToyShoppingDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260505125548_AddUrlMappingsTable")]
+    partial class AddUrlMappingsTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

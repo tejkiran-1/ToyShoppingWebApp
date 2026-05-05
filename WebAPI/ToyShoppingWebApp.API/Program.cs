@@ -84,11 +84,13 @@ builder.Services.AddScoped<IToyRepository, ToyRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<IUrlShortnerRepository, UrlShortnerRepository>();
 
 builder.Services.AddScoped<IToyService, ToyService>();
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<IUrlShortnerService, UrlShortnerService>();
 
 builder.Services.AddAuthentication(options =>
 {
@@ -116,7 +118,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAngular", policy =>
     {
-        policy.WithOrigins("http://localhost:4200")
+        policy.WithOrigins("http://localhost:50337")
               .AllowAnyMethod()
               .AllowAnyHeader()
               .AllowCredentials();
@@ -192,4 +194,67 @@ finally
 {
     Log.Information("🛑 Shutting down ToyShoppingWebApp API");
     Log.CloseAndFlush();
+}
+
+
+
+
+interface ITaxCalculator
+{
+    double CalculateTax(int amount);
+}
+
+class IndianEmployeeTax : ITaxCalculator
+{
+    public double CalculateTax(int amount)
+    {
+        return amount * 0.8;
+    }
+}
+
+/*
+class TaxCalculator
+{
+    private readonly ITaxCalculator taxCalculator;
+
+    TaxCalculator(ITaxCalculator tax)
+    {
+        taxCalculator = tax;
+    }
+
+    public void PrintTaxValue(int amount)
+    {
+        Console.WriteLine(taxCalculator.CalculateTax(amount));
+
+    }
+}
+*/
+
+// Adapter Pattern
+class LegacyService
+{
+    public void DoingSomething()
+    {
+        
+    }
+}
+
+interface ICustomService
+{
+    void DoingSomethingCustom();
+}
+
+class CustomAdapter : ICustomService
+{
+    private readonly LegacyService legacyService;
+
+    CustomAdapter(LegacyService legacy)
+    {
+        legacyService = legacy;
+    }
+
+    public void DoingSomethingCustom()
+    {
+        legacyService.DoingSomething();
+    }
 }

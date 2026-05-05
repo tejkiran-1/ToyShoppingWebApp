@@ -20,6 +20,7 @@ namespace ToyShoppingWebApp.Application.Data
         public DbSet<Toy> Toys { get; set; } = null!;
         public DbSet<Order> Orders { get; set; } = null!;
         public DbSet<OrderItem> OrderItems { get; set; } = null!;
+        public DbSet<UrlMapping> UrlMappings { get; set; } = null!;
 
         /// <summary>
         /// Configure entity mappings, relationships, and constraints
@@ -139,6 +140,22 @@ namespace ToyShoppingWebApp.Application.Data
 
                 // Composite index for efficient queries
                 entity.HasIndex(oi => new { oi.OrderId, oi.ToyId });
+            });
+
+            modelBuilder.Entity<UrlMapping>(entity =>
+            {
+                entity.HasKey(um => um.Id);
+
+                entity.Property(um => um.ShortCode)
+                    .IsRequired()
+                    .HasMaxLength(100);
+
+                entity.Property(um => um.LongUrl)
+                    .IsRequired()
+                    .HasMaxLength(2000);
+
+                // ShortCode must be unique
+                entity.HasIndex(um => um.ShortCode).IsUnique();
             });
         }
     }

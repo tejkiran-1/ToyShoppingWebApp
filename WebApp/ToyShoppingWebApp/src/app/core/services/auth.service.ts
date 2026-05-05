@@ -4,13 +4,15 @@ import { Observable, BehaviorSubject } from 'rxjs';
 import { tap } from 'rxjs/operators';
 
 interface LoginRequest {
-  username: string;
+  email: string;
   password: string;
 }
 
 interface LoginResponse {
+  success: boolean;
+  message: string;
   token: string;
-  expiresIn: number;
+  user?: any;
 }
 
 interface DecodedToken {
@@ -38,21 +40,21 @@ export class AuthService {
   }
 
   // Login: Call backend API
-  login(username: string, password: string): Observable<LoginResponse> {
-    const request: LoginRequest = { username, password };
+  login(email: string, password: string): Observable<LoginResponse> {
+    const request: LoginRequest = { email, password };
     
     return this.http.post<LoginResponse>(`${this.apiUrl}/login`, request).pipe(
       tap(response => {
         // Store token in localStorage
         localStorage.setItem('token', response.token);
         
-        // Extract and store role
-        const role = this.extractRoleFromToken(response.token);
+        // Store role from response (more reliable than extracting from JWT)
+        const role = response.user?.role;
         localStorage.setItem('userRole', role || '');
         
         // Update observables (notify all subscribers)
         this.isLoggedInSubject.next(true);
-        this.userRoleSubject.next(role);
+        this.userRoleSubject.next(role || null);
         
         console.log('✅ Login successful. Role:', role);
       })
@@ -60,8 +62,8 @@ export class AuthService {
   }
 
   // Register: Call backend API
-  register(username: string, email: string, password: string): Observable<any> {
-    const request = { username, email, password };
+  register(username: string, email: string, password: string, confirmPassword: string): Observable<any> {
+    const request = { Name: username, Email: email, Password: password, ConfirmPassword: confirmPassword };
     return this.http.post(`${this.apiUrl}/register`, request);
   }
 

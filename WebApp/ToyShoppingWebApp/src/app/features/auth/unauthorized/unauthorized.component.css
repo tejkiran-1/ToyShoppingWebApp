@@ -1,0 +1,17 @@
+.unauthorized-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+.unauthorized-box {
+    background: white;
+    padding: 40px;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+h1 { color: #d9534f; }
+button { padding: 10px 20px; background-color: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer; }
+button:hover { background-color: #764ba2; }

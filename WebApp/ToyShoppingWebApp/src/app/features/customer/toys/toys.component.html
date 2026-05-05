@@ -1,0 +1,82 @@
+<div class="toys-container">
+    <nav>
+        <button (click)="goBack()">← Back to Dashboard</button>
+        <h1>🧸 Browse Toys</h1>
+    </nav>
+    
+    <div class="content">
+        <!-- Error Message -->
+        <div *ngIf="errorMessage" class="error-message">
+            ❌ {{ errorMessage }}
+        </div>
+
+        <!-- Loading State -->
+        <div *ngIf="isLoading" class="loading">
+            ⏳ Loading toys...
+        </div>
+
+        <!-- Toys Grid -->
+        <div *ngIf="!isLoading && toys.length > 0" class="toys-grid">
+            <div *ngFor="let toy of toys" class="toy-card">
+                <div class="toy-info">
+                    <h3>{{ toy.name }}</h3>
+                    <p class="description">{{ toy.description }}</p>
+                    <p class="price">${{ toy.price | number: '1.2-2' }}</p>
+                    <p class="stock" [class.out-of-stock]="toy.stock === 0">
+                        Stock: {{ toy.stock > 0 ? toy.stock : 'Out of Stock' }}
+                    </p>
+                </div>
+                <button 
+                    class="add-to-cart-btn" 
+                    (click)="addToCart(toy)"
+                    [disabled]="toy.stock === 0">
+                    🛒 Add to Cart
+                </button>
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div *ngIf="!isLoading && toys.length === 0 && !errorMessage" class="empty-state">
+            <p>No toys available at the moment.</p>
+        </div>
+
+        <!-- URL Shortener Section -->
+        <div class="url-shortener-section">
+            <h2>🔗 URL Shortener (Learning Demo)</h2>
+            
+            <div class="shortener-form">
+                <input 
+                    type="text" 
+                    placeholder="Enter URL to shorten (e.g., https://example.com/long/url)"
+                    [(ngModel)]="urlToShorten"
+                    [disabled]="isShorteningUrl"
+                    class="url-input">
+                <button 
+                    (click)="shortenUrl()"
+                    [disabled]="isShorteningUrl || !urlToShorten.trim()"
+                    class="shorten-btn">
+                    {{ isShorteningUrl ? '⏳ Shortening...' : '✂️ Shorten' }}
+                </button>
+            </div>
+
+            <!-- Error Message -->
+            <div *ngIf="shortenUrlError" class="error-message">
+                ❌ {{ shortenUrlError }}
+            </div>
+
+            <!-- Success Message -->
+            <div *ngIf="shortenUrlSuccess" class="success-message">
+                {{ shortenUrlSuccess }}
+            </div>
+
+            <!-- Shortened URL Display -->
+            <div *ngIf="shortenedUrl" class="shortened-url-result">
+                <p class="result-label">Your Shortened URL:</p>
+                <div class="url-display">
+                    <input type="text" [value]="shortenedUrl" readonly class="url-output">
+                    <button (click)="copyToClipboard()" class="copy-btn">📋 Copy</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
